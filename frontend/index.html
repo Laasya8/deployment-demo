@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSI SBC • Deployment Demo</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Ambient Glow Backgrounds -->
+  <div class="glow glow-1"></div>
+  <div class="glow glow-2"></div>
+
+  <div class="container">
+    <div class="card">
+
+      <!-- CSI Badge Header -->
+      <div class="badge">
+        <span class="pulse-dot"></span>
+        <span>CSI SBC • STUDENT BRANCH CHAPTER</span>
+      </div>
+
+      <h1>Cloud Deployment Demo</h1>
+      <p class="subtitle">Frontend on <strong>Vercel</strong> ⇄ Backend on <strong>Render</strong></p>
+
+      <!-- URL Input Box -->
+      <div class="input-group">
+        <label for="backendUrl">Backend API URL:</label>
+        <input 
+          type="text" 
+          id="backendUrl" 
+          value="http://localhost:5000" 
+          placeholder="http://localhost:5000 or https://your-backend.onrender.com" 
+        />
+        <small class="hint">Use localhost locally, or paste your Render URL when deployed</small>
+      </div>
+
+      <!-- Action Button -->
+      <button id="btnCall" onclick="callBackend()">
+        <span>🚀 Test Backend Connection</span>
+      </button>
+
+      <!-- Results Display -->
+      <div class="result-box">
+        <div class="result-header">
+          <span>Backend Response</span>
+          <span id="statusTag" class="status-tag">READY</span>
+        </div>
+
+        <div class="result-content">
+          <div class="row">
+            <span class="label">Message:</span>
+            <span id="resMessage" class="val">Click button above to call backend</span>
+          </div>
+          <div class="row">
+            <span class="label">Render Secret Key:</span>
+            <span id="resSecret" class="val secret-val">Waiting...</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        💡 <em>The Secret Key above is fetched from Render's Environment Variables (not hardcoded in code!)</em>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    async function callBackend() {
+      const url = document.getElementById("backendUrl").value.trim().replace(/\/+$/, "");
+      const resMessage = document.getElementById("resMessage");
+      const resSecret = document.getElementById("resSecret");
+      const statusTag = document.getElementById("statusTag");
+      const btn = document.getElementById("btnCall");
+
+      btn.disabled = true;
+      statusTag.className = "status-tag loading";
+      statusTag.innerText = "CONNECTING...";
+      resMessage.innerText = `Fetching ${url}/api ...`;
+      resSecret.innerText = "Loading...";
+
+      try {
+        const response = await fetch(`${url}/api`);
+        const data = await response.json();
+
+        statusTag.className = "status-tag success";
+        statusTag.innerText = `${response.status} OK`;
+        resMessage.innerText = data.message;
+        resSecret.innerText = data.secretKey;
+      } catch (err) {
+        statusTag.className = "status-tag error";
+        statusTag.innerText = "FAILED";
+        resMessage.innerText = "Error: Could not connect to backend.";
+        resSecret.innerText = "Is backend running on Render / localhost?";
+      } finally {
+        btn.disabled = false;
+      }
+    }
+  </script>
+
+</body>
+</html>

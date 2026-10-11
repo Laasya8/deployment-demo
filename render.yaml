@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: csi-deployment-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install
+    startCommand: node server.js
+    plan: free
+    envVars:
+      - key: SECRET_KEY
+        value: "MySecretRenderPassword123"
